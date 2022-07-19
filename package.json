@@ -8,6 +8,8 @@
     "scripts": {
         "start": "node ./index.js",
         "watch": "nodemon ./index.js",
+        "lint": "eslint .",
+        "test": "jest"
     },
     "repository": {
         "type": "git",
