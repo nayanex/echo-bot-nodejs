@@ -26,10 +26,21 @@ const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log(`\n${ server.name } listening to ${ server.url }`);
+    console.log(`\n${server.name} listening to ${server.url}`);
     console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
     console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
 });
+
+// Map configuration values values from .env file for each service
+const QnAConfiguration = {
+    knowledgeBaseId: process.env.QnAKnowledgebaseId,
+    endpointKey: process.env.QnAAuthKey,
+    host: process.env.QnAEndpointHostName
+};
+// Pass into configuration object
+const configuration = {
+    QnAConfiguration
+}
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
     MicrosoftAppId: process.env.MicrosoftAppId,
@@ -50,12 +61,12 @@ const onTurnErrorHandler = async (context, error) => {
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights. See https://aka.ms/bottelemetry for telemetry
     //       configuration instructions.
-    console.error(`\n [onTurnError] unhandled error: ${ error }`);
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${ error }`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -68,8 +79,9 @@ const onTurnErrorHandler = async (context, error) => {
 // Set the onTurnError for the singleton CloudAdapter.
 adapter.onTurnError = onTurnErrorHandler;
 
-// Create the main dialog.
-const myBot = new EchoBot();
+// Create the main dialog and
+// Pass the configuration to the EchoBot
+const myBot = new EchoBot(configuration);
 
 // Listen for incoming requests.
 server.post('/api/messages', async (req, res) => {
