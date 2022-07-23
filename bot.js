@@ -3,6 +3,7 @@
 
 const { ActivityHandler, MessageFactory } = require('botbuilder');
 const { QnAMaker } = require('botbuilder-ai');
+const IntentRecognizer = require("./intentrecognizer")
 
 class EchoBot extends ActivityHandler {
     constructor(configuration, qnaOptions) {
@@ -11,11 +12,32 @@ class EchoBot extends ActivityHandler {
 
         // create a QnAMaker connector
         this.qnaMaker = new QnAMaker(configuration.QnAConfiguration, qnaOptions);
+        // create a LUIS connector
+        this.intentRecognizer = new IntentRecognizer(configuration.LuisConfiguration);
 
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
         this.onMessage(async (context, next) => {
             // Send user input to QnA Maker
             const qnaResults = await this.qnaMaker.getAnswers(context);
+
+            // send user input to LUIS
+            const LuisResult = await this.intentRecognizer.executeLuisQuery(context);
+
+            // Determine which service to respond with //
+            if (LuisResult.luisResult.prediction.topIntent === "findParking" &&
+                LuisResult.intents.findParking.score > .6 &&
+                LuisResult.entities.$instance &&
+                LuisResult.entities.$instance.location &&
+                LuisResult.entities.$instance.location[0]
+            ) {
+                const location = LuisResult.entities.$instance.location[0].text;
+                // call api with location entity info
+                const getLocationOfParking = "I found parking with a charging station at " + location;
+                console.log(getLocationOfParking)
+                await context.sendActivity(getLocationOfParking);
+                await next();
+                return;
+            }
 
             // If an answer was received from QnA Maker, send the answer back to the user.
             if (qnaResults[0]) {

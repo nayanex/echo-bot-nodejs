@@ -84,3 +84,12 @@ Install Jest and skip tests
 ```
 npm install --save-dev jest-cli   
 ```
+
+## [Create LUIS resources without using the LUIS portal][1].
+By using Azure CLI:
+
+```bash
+az cognitiveservices account create -n my-luis-authoring-resource -g my-resource-group --kind LUIS.Authoring --sku F0 -l westeurope --yes
+```
+
+

@@ -37,9 +37,17 @@ const QnAConfiguration = {
     endpointKey: process.env.QnAAuthKey,
     host: process.env.QnAEndpointHostName
 };
-// Pass into configuration object
+
+const LuisConfiguration = {
+    applicationId: process.env.LuisAppId,
+    endpointKey: process.env.LuisAPIKey,
+    endpoint: process.env.LuisAPIHostName,
+}
+
+//pack each service configuration into 
 const configuration = {
-    QnAConfiguration
+    QnAConfiguration,
+    LuisConfiguration,
 }
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
