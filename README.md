@@ -92,4 +92,6 @@ By using Azure CLI:
 az cognitiveservices account create -n my-luis-authoring-resource -g my-resource-group --kind LUIS.Authoring --sku F0 -l westeurope --yes
 ```
 
-
+```
+npm install --save @azure/ai-text-analytics
+```
